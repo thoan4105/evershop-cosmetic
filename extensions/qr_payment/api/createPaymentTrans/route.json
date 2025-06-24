@@ -1,0 +1,5 @@
+{
+  "methods": ["POST"],
+  "path": "/qr-code/paymentIntents",
+  "access": "public"
+}

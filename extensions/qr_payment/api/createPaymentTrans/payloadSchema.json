@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "cart_id": {
+      "type": "string"
+    },
+    "order_id": {
+      "type": "string"
+    },
+    "transaction_code": {
+      "type": "string"
+    }
+  },
+  "required": ["cart_id", "order_id", "transaction_code"],
+  "additionalProperties": true,
+  "errorMessage": {
+    "properties": {
+      "cart_id": "Cart is invalid",
+      "order_id": "Order is invalid",
+      "transaction_code": "Code is invalid"
+    }
+  }
+}
