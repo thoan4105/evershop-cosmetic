@@ -57,15 +57,54 @@ const generateCode = (length = 6) => {
   return code;
 };
 
-const paymentCode = "TH" + generateCode(6);
+const formatTime = (seconds) => {
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+};
 
 export default function CheckoutForm({
   createPaymentSessionApi,
-  pollPaymentStatusApi,
-  successUrl,
+  returnUrl,
+  total,
+  pollingPaymentStatusUrl,
 }) {
-  const { steps, cartId, orderId, orderIntegerId, orderPlaced, paymentMethods } = useCheckout();
+  const [paymentCode, setPaymentCode] = useState("TH" + generateCode(6));
+  const {
+    steps,
+    cartId,
+    orderId,
+    orderIntegerId,
+    orderPlaced,
+    paymentMethods,
+  } = useCheckout();
   const { placeOrder, setError } = useCheckoutDispatch();
+  const [expiresIn, setExpiresIn] = useState(300);
+  const [copiedField, setCopiedField] = useState(null);
+  const [isPaid, setIsPaid] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPaymentCode("TH" + generateCode(6));
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setExpiresIn((prev) => {
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, []);
 
   const [result] = useQuery({
     query: cartQuery,
@@ -75,87 +114,99 @@ export default function CheckoutForm({
     pause: orderPlaced === true,
   });
 
-  useEffect(() => {
-    if (orderIntegerId && orderPlaced) {
-      window
-        .fetch(createPaymentSessionApi, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ cart_id: cartId, order_id: orderIntegerId.toString(), transaction_code: paymentCode })
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            toast.error(_('Some error occurred. Please try again later.'));
-          } else {
-            response.redirect(buildUrl('checkoutSuccess', { orderId: order_id }));
-          }
-        });
-    }
-  }, [orderIntegerId]);
+  const waitForPayment = async (orderId) => {
+    const maxTries = 30;
+    let tries = 0;
+
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(async () => {
+        tries++;
+
+        const res = await fetch(
+          `${pollingPaymentStatusUrl}?order_id=${orderId}`
+        );
+        const data = await res.json();
+
+        if (data.status === "paid") {
+          clearInterval(interval);
+          resolve("success");
+        } else if (tries >= maxTries) {
+          clearInterval(interval);
+          reject("failed or timeout");
+        }
+      }, 2000);
+    });
+  };
 
   useEffect(() => {
-    console.log("start");
+    if (orderIntegerId && orderPlaced) {
+      const createAndWait = async () => {
+        try {
+          const res = await fetch(createPaymentSessionApi, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              cart_id: cartId,
+              order_id: orderIntegerId.toString(),
+              transaction_code: paymentCode,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (data.error) {
+            toast.error("Có lỗi xảy ra. Vui lòng thử lại sau.");
+          } else {
+            await waitForPayment(orderId);
+            setIsPaid(true);
+          }
+        } catch (err) {
+          console.error("Error creating payment session:", err);
+        }
+      };
+
+      createAndWait();
+    }
+  }, [orderIntegerId, orderPlaced]);
+
+  useEffect(() => {
+    if (isPaid) {
+      const timer = setTimeout(() => {
+        window.location.href = `${returnUrl}?order_id=${orderId}`;
+      }, 600);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isPaid]);
+
+  useEffect(() => {
     const pay = async () => {
       await placeOrder();
     };
-    console.log(steps);
     if (steps.every((step) => step.isCompleted)) {
       pay();
     }
   }, [steps]);
 
-  // Gọi API tạo phiên thanh toán khi đã có orderId
-  // useEffect(() => {
-  //   const createPaymentSession = async () => {
-  //     const res = await fetch(createPaymentSessionApi, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ order_id: orderId, cart_id: cartId }),
-  //     });
-  //     const data = await res.json();
-
-  //     // Có thể redirect tới cổng thanh toán, hoặc hiển thị QR code
-  //     if (data.paymentUrl) {
-  //       window.open(data.paymentUrl, "_blank"); // hoặc dùng location.href nếu muốn chuyển trang luôn
-  //     }
-
-  //     // Poll trạng thái đơn hàng sau khi mở thanh toán
-  //     const interval = setInterval(async () => {
-  //       const checkRes = await fetch(
-  //         `${pollPaymentStatusApi}?order_id=${orderId}`
-  //       );
-  //       const checkData = await checkRes.json();
-  //       if (checkData.status === "paid") {
-  //         clearInterval(interval);
-  //         window.location.href = `${successUrl}/${orderId}`;
-  //       }
-  //     }, 3000);
-  //   };
-
-  //   if (orderPlaced && orderId) {
-  //     createPaymentSession();
-  //   }
-  // }, [orderPlaced, orderId]);
-
   const content = `${paymentCode} hoantc mai dinh`;
   const bankId = "techcombank";
   const accountNumber = "1111686829";
   const accountName = "Tran Cong Hoan";
-  const total = "156000";
   const urlQrCode = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.jpg?amount=${total}&addInfo=${content}&accountName=${accountName}`;
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
+  const handleCopy = (text, field) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    });
   };
 
   const qrCodePaymentMethod = paymentMethods.find(
     (method) => method.code === "qrCode" && method.selected === true
   );
 
-  console.log(qrCodePaymentMethod);
   if (!qrCodePaymentMethod) {
     return null;
   }
@@ -163,27 +214,49 @@ export default function CheckoutForm({
   return (
     <>
       <div className="qr-details mb-2 space-y-2 mb-4">
+        <div className="text-sm text-red-600 font-semibold">
+          Mã sẽ hết hạn sau: {formatTime(expiresIn)}
+        </div>
         <div className="flex items-baseline gap-2">
           <strong className="qr-detail-label">Ngân hàng:</strong>
           <span className="text-sm">{bankId}</span>
           <button
             type="button"
             className="text-blue-500 underline text-sm copy-icon"
-            onClick={() => handleCopy(bankId)}
+            onClick={() => handleCopy(bankId, "bankId")}
           >
             <span>
-              <svg
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M14.3933 22.5712H6.50649C4.68497 22.5712 3.20312 21.0894 3.20312 19.2679V8.07771C3.20312 6.25619 4.68497 4.77434 6.50649 4.77434H14.3933C16.2148 4.77434 17.6966 6.25619 17.6966 8.07771V19.2679C17.6966 21.0894 16.2148 22.5712 14.3933 22.5712ZM6.50649 6.42603C5.59579 6.42603 4.85481 7.16701 4.85481 8.07771V19.2679C4.85481 20.1786 5.59579 20.9195 6.50649 20.9195H14.3933C15.304 20.9195 16.045 20.1786 16.045 19.2679V8.07771C16.045 7.16701 15.304 6.42603 14.3933 6.42603H6.50649ZM21 17.2033V4.73305C21 2.91154 19.5182 1.42969 17.6966 1.42969H8.5298C8.07365 1.42969 7.70396 1.79938 7.70396 2.25553C7.70396 2.71168 8.07365 3.08137 8.5298 3.08137H17.6966C18.6073 3.08137 19.3483 3.82236 19.3483 4.73305V17.2033C19.3483 17.6594 19.718 18.0291 20.1742 18.0291C20.6303 18.0291 21 17.6594 21 17.2033Z"
-                  fill="#262626"
-                />
-              </svg>
+              <span>
+                {copiedField === "bankId" ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="1em"
+                    height="1em"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="green"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" stroke="green" fill="none" />
+                    <path d="M9 12l2 2l4 -4" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M14.3933 22.5712H6.50649C4.68497 22.5712 3.20312 21.0894 3.20312 19.2679V8.07771C3.20312 6.25619 4.68497 4.77434 6.50649 4.77434H14.3933C16.2148 4.77434 17.6966 6.25619 17.6966 8.07771V19.2679C17.6966 21.0894 16.2148 22.5712 14.3933 22.5712ZM6.50649 6.42603C5.59579 6.42603 4.85481 7.16701 4.85481 8.07771V19.2679C4.85481 20.1786 5.59579 20.9195 6.50649 20.9195H14.3933C15.304 20.9195 16.045 20.1786 16.045 19.2679V8.07771C16.045 7.16701 15.304 6.42603 14.3933 6.42603H6.50649ZM21 17.2033V4.73305C21 2.91154 19.5182 1.42969 17.6966 1.42969H8.5298C8.07365 1.42969 7.70396 1.79938 7.70396 2.25553C7.70396 2.71168 8.07365 3.08137 8.5298 3.08137H17.6966C18.6073 3.08137 19.3483 3.82236 19.3483 4.73305V17.2033C19.3483 17.6594 19.718 18.0291 20.1742 18.0291C20.6303 18.0291 21 17.6594 21 17.2033Z"
+                      fill="#262626"
+                    />
+                  </svg>
+                )}
+              </span>
             </span>
           </button>
         </div>
@@ -193,21 +266,40 @@ export default function CheckoutForm({
           <button
             type="button"
             className="text-blue-500 underline text-sm  copy-icon"
-            onClick={() => handleCopy(content)}
+            onClick={() => handleCopy(content, "content")}
           >
             <span>
-              <svg
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M14.3933 22.5712H6.50649C4.68497 22.5712 3.20312 21.0894 3.20312 19.2679V8.07771C3.20312 6.25619 4.68497 4.77434 6.50649 4.77434H14.3933C16.2148 4.77434 17.6966 6.25619 17.6966 8.07771V19.2679C17.6966 21.0894 16.2148 22.5712 14.3933 22.5712ZM6.50649 6.42603C5.59579 6.42603 4.85481 7.16701 4.85481 8.07771V19.2679C4.85481 20.1786 5.59579 20.9195 6.50649 20.9195H14.3933C15.304 20.9195 16.045 20.1786 16.045 19.2679V8.07771C16.045 7.16701 15.304 6.42603 14.3933 6.42603H6.50649ZM21 17.2033V4.73305C21 2.91154 19.5182 1.42969 17.6966 1.42969H8.5298C8.07365 1.42969 7.70396 1.79938 7.70396 2.25553C7.70396 2.71168 8.07365 3.08137 8.5298 3.08137H17.6966C18.6073 3.08137 19.3483 3.82236 19.3483 4.73305V17.2033C19.3483 17.6594 19.718 18.0291 20.1742 18.0291C20.6303 18.0291 21 17.6594 21 17.2033Z"
-                  fill="#262626"
-                />
-              </svg>
+              <span>
+                {copiedField === "content" ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="1em"
+                    height="1em"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="green"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" stroke="green" fill="none" />
+                    <path d="M9 12l2 2l4 -4" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M14.3933 22.5712H6.50649C4.68497 22.5712 3.20312 21.0894 3.20312 19.2679V8.07771C3.20312 6.25619 4.68497 4.77434 6.50649 4.77434H14.3933C16.2148 4.77434 17.6966 6.25619 17.6966 8.07771V19.2679C17.6966 21.0894 16.2148 22.5712 14.3933 22.5712ZM6.50649 6.42603C5.59579 6.42603 4.85481 7.16701 4.85481 8.07771V19.2679C4.85481 20.1786 5.59579 20.9195 6.50649 20.9195H14.3933C15.304 20.9195 16.045 20.1786 16.045 19.2679V8.07771C16.045 7.16701 15.304 6.42603 14.3933 6.42603H6.50649ZM21 17.2033V4.73305C21 2.91154 19.5182 1.42969 17.6966 1.42969H8.5298C8.07365 1.42969 7.70396 1.79938 7.70396 2.25553C7.70396 2.71168 8.07365 3.08137 8.5298 3.08137H17.6966C18.6073 3.08137 19.3483 3.82236 19.3483 4.73305V17.2033C19.3483 17.6594 19.718 18.0291 20.1742 18.0291C20.6303 18.0291 21 17.6594 21 17.2033Z"
+                      fill="#262626"
+                    />
+                  </svg>
+                )}
+              </span>
             </span>
           </button>
         </div>
@@ -217,28 +309,58 @@ export default function CheckoutForm({
           <button
             type="button"
             className="text-blue-500 underline text-sm copy-icon"
-            onClick={() => handleCopy(accountNumber)}
+            onClick={() => handleCopy(accountNumber, "account")}
           >
             <span>
-              <svg
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M14.3933 22.5712H6.50649C4.68497 22.5712 3.20312 21.0894 3.20312 19.2679V8.07771C3.20312 6.25619 4.68497 4.77434 6.50649 4.77434H14.3933C16.2148 4.77434 17.6966 6.25619 17.6966 8.07771V19.2679C17.6966 21.0894 16.2148 22.5712 14.3933 22.5712ZM6.50649 6.42603C5.59579 6.42603 4.85481 7.16701 4.85481 8.07771V19.2679C4.85481 20.1786 5.59579 20.9195 6.50649 20.9195H14.3933C15.304 20.9195 16.045 20.1786 16.045 19.2679V8.07771C16.045 7.16701 15.304 6.42603 14.3933 6.42603H6.50649ZM21 17.2033V4.73305C21 2.91154 19.5182 1.42969 17.6966 1.42969H8.5298C8.07365 1.42969 7.70396 1.79938 7.70396 2.25553C7.70396 2.71168 8.07365 3.08137 8.5298 3.08137H17.6966C18.6073 3.08137 19.3483 3.82236 19.3483 4.73305V17.2033C19.3483 17.6594 19.718 18.0291 20.1742 18.0291C20.6303 18.0291 21 17.6594 21 17.2033Z"
-                  fill="#262626"
-                />
-              </svg>
+              {copiedField === "account" ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="green"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" stroke="green" fill="none" />
+                  <path d="M9 12l2 2l4 -4" />
+                </svg>
+              ) : (
+                <svg
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M14.3933 22.5712H6.50649C4.68497 22.5712 3.20312 21.0894 3.20312 19.2679V8.07771C3.20312 6.25619 4.68497 4.77434 6.50649 4.77434H14.3933C16.2148 4.77434 17.6966 6.25619 17.6966 8.07771V19.2679C17.6966 21.0894 16.2148 22.5712 14.3933 22.5712ZM6.50649 6.42603C5.59579 6.42603 4.85481 7.16701 4.85481 8.07771V19.2679C4.85481 20.1786 5.59579 20.9195 6.50649 20.9195H14.3933C15.304 20.9195 16.045 20.1786 16.045 19.2679V8.07771C16.045 7.16701 15.304 6.42603 14.3933 6.42603H6.50649ZM21 17.2033V4.73305C21 2.91154 19.5182 1.42969 17.6966 1.42969H8.5298C8.07365 1.42969 7.70396 1.79938 7.70396 2.25553C7.70396 2.71168 8.07365 3.08137 8.5298 3.08137H17.6966C18.6073 3.08137 19.3483 3.82236 19.3483 4.73305V17.2033C19.3483 17.6594 19.718 18.0291 20.1742 18.0291C20.6303 18.0291 21 17.6594 21 17.2033Z"
+                    fill="#262626"
+                  />
+                </svg>
+              )}
             </span>
           </button>
         </div>
       </div>
       <span>Hoặc: </span>
-      <div className="qr-image">
-        <img src={urlQrCode} alt="QR Code" />
+      <div className="qr-image-wrapper">
+        <div className="qr-image">
+          <img src={urlQrCode} alt="QR Code" />
+          {isPaid && (
+            <div className="qr-overlay">
+              <svg
+                className="qr-check"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path d="M20.285 6.709l-11.315 11.316-5.657-5.658 1.414-1.414 4.243 4.243 9.9-9.899z" />
+              </svg>
+            </div>
+          )}
+        </div>
         <p className="qr-note">
           (*Chú ý: Vui lòng chuyển khoản đúng nội dung để được xác nhận thanh
           toán!)
@@ -249,7 +371,8 @@ export default function CheckoutForm({
 }
 
 CheckoutForm.propTypes = {
-  createPaymentSessionApi: PropTypes.string.isRequired, // API để tạo phiên thanh toán
-  pollPaymentStatusApi: PropTypes.string.isRequired, // API để check trạng thái thanh toán
-  successUrl: PropTypes.string.isRequired, // URL chuyển đến khi thành công
+  createPaymentSessionApi: PropTypes.string.isRequired,
+  returnUrl: PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
+  pollingPaymentStatusUrl: PropTypes.string.isRequired,
 };

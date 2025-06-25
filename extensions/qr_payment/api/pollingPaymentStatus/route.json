@@ -1,0 +1,5 @@
+{
+  "methods": ["GET"],
+  "path": "/order/payment-status",
+  "access": "public"
+}

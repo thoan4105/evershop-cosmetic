@@ -5,15 +5,24 @@ import StripeLogo from "@components/frontStore/stripe/StripeLogo";
 import "./QrCode.scss";
 import CheckoutForm from "./CheckoutForm";
 
-function QrCodeApp({ total }) {
+function QrCodeApp({ total, returnUrl, pollingPaymentStatusUrl }) {
   return (
     <div className="stripe__app qr-code">
-      <CheckoutForm createPaymentSessionApi="/api/qr-code/paymentIntents"/>
+      <CheckoutForm
+        createPaymentSessionApi="/api/qr-code/paymentIntents"
+        returnUrl={returnUrl}
+        total={total}
+        pollingPaymentStatusUrl={pollingPaymentStatusUrl}
+      />
     </div>
   );
 }
 
-export default function QRCodeMethod({ cart: { grandTotal, currency } }) {
+export default function QRCodeMethod({
+  cart: { grandTotal, currency },
+  returnUrl,
+  pollingPaymentStatusUrl,
+}) {
   const checkout = useCheckout();
   const { paymentMethods, setPaymentMethods } = checkout;
 
@@ -91,7 +100,11 @@ export default function QRCodeMethod({ cart: { grandTotal, currency } }) {
       <div>
         {selectedPaymentMethod && selectedPaymentMethod.code === "qrCode" && (
           <div className="mt-5">
-            <QrCodeApp total={grandTotal.value} />
+            <QrCodeApp
+              total={grandTotal.value}
+              returnUrl={returnUrl}
+              pollingPaymentStatusUrl={pollingPaymentStatusUrl}
+            />
           </div>
         )}
       </div>
@@ -112,5 +125,7 @@ export const query = `
       }
       currency
     }
+    returnUrl: url(routeId: "returnQrCode")
+    pollingPaymentStatusUrl: url(routeId: "pollingPaymentStatus")
   }
 `;

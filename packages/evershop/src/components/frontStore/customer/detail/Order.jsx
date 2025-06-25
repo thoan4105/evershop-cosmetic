@@ -1,7 +1,7 @@
-import { _ } from '@evershop/evershop/src/lib/locale/translate';
-import PropTypes from 'prop-types';
-import React from 'react';
-import ProductNoThumbnail from '@components/common/ProductNoThumbnail';
+import { _ } from "@evershop/evershop/src/lib/locale/translate";
+import PropTypes from "prop-types";
+import React from "react";
+import ProductNoThumbnail from "@components/common/ProductNoThumbnail";
 
 export default function Order({ order }) {
   return (
@@ -13,7 +13,7 @@ export default function Order({ order }) {
               <div className="thumbnail border border-divider p-4 rounded">
                 {item.thumbnail && (
                   <img
-                    style={{ maxWidth: '6rem' }}
+                    style={{ maxWidth: "6rem" }}
                     src={item.thumbnail}
                     alt={item.productName}
                   />
@@ -27,9 +27,9 @@ export default function Order({ order }) {
                   {item.productName}
                 </div>
                 <div className="order-item-sku italic">
-                  {_('Sku')}: #{item.productSku}
+                  {_("Sku")}: #{item.productSku}
                 </div>
-                <div className="order-item-qty" style={{ fontSize: '0.9em' }}>
+                <div className="order-item-qty" style={{ fontSize: "0.9em" }}>
                   {item.qty} x {item.productPrice.text}
                 </div>
               </div>
@@ -38,15 +38,22 @@ export default function Order({ order }) {
         </div>
         <div className="order-total col-span-1">
           <div className="order-header">
+            <div className="order-payment-status">
+              <span className="italic pl-4">
+                {order.paymentStatus.name === "Pending"
+                  ? _("Pending")
+                  : _("Paid")}
+              </span>
+            </div>
             <div className="order-number">
               <span className="font-bold">
-                {_('Order')}: #{order.orderNumber}
+                {_("Order")}: #{order.orderNumber}
               </span>
               <span className="italic pl-4">{order.createdAt.text}</span>
             </div>
           </div>
           <div className="order-total-value font-bold">
-            {_('Total')}:{order.grandTotal.text}
+            {_("Total")}:{order.grandTotal.text}
           </div>
         </div>
       </div>
@@ -57,22 +64,23 @@ export default function Order({ order }) {
 Order.propTypes = {
   order: PropTypes.shape({
     createdAt: PropTypes.shape({
-      text: PropTypes.string.isRequired
+      text: PropTypes.string.isRequired,
     }),
     grandTotal: PropTypes.shape({
-      text: PropTypes.string.isRequired
+      text: PropTypes.string.isRequired,
     }),
     items: PropTypes.arrayOf(
       PropTypes.shape({
         productPrice: PropTypes.shape({
-          text: PropTypes.string.isRequired
+          text: PropTypes.string.isRequired,
         }),
         productSku: PropTypes.string.isRequired,
         productName: PropTypes.string.isRequired,
         thumbnail: PropTypes.string,
-        qty: PropTypes.number.isRequired
+        qty: PropTypes.number.isRequired,
       })
     ),
-    orderNumber: PropTypes.string.isRequired
-  }).isRequired
+    orderNumber: PropTypes.string.isRequired,
+    paymentStatus: PropTypes.string.isRequired,
+  }).isRequired,
 };

@@ -1,11 +1,15 @@
 .qr-image {
   width: 380px;
   height: 420px;
+  position: relative;
 }
 
 .qr-image img {
+  display: block;
   width: 100%;
   height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
 .qr-code {
@@ -14,6 +18,34 @@
   justify-content: center;
   align-items: center;
   padding-bottom: 10px;
+}
+
+.qr-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.qr-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9); /* Lớp phủ trắng mờ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.qr-check {
+  width: 64px;
+  height: 64px;
+  fill: green;
+  transform: scale(0.5);
+  opacity: 0;
+  animation: tickIn 0.4s 0.2s ease forwards;
 }
 
 .qr-note {
@@ -32,4 +64,24 @@
 
 .copy-icon {
   font-size: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tickIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
