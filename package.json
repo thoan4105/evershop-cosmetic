@@ -54,6 +54,7 @@
     "webpack-bundle-analyzer": "^4.5.0"
   },
   "dependencies": {
+    "aos": "^2.3.4",
     "react-helmet": "^6.1.0"
   }
 }

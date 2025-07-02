@@ -1,22 +1,46 @@
-import React from "react";
-import "./MainBanner.scss";
+import React, { useEffect } from 'react';
+import './MainBanner.scss';
+import AOS from 'aos';
 
 function MainBanner() {
-  return (
-    <div className="main-banner-home flex items-center">
-      <div className="page-width grid grid-cols-1 md:grid-cols-2 gap-2">
-        <div className="text-center md:text-left px-2 ">
-          <h2 className="h1 ">Unleash Your Inner Style Icon</h2>
-          <p>Discover the Latest Trends and Elevate Your Wardrobe Today</p>
-          <p></p>
-          <a className="button button-primary" href="#">
-            SHOW NOW
-          </a>
-        </div>
-        <div />
-      </div>
-    </div>
-  );
+	useEffect(() => {
+		AOS.init({
+			duration: 1000,
+			once: true,
+		});
+	}, []);
+
+	return (
+		<div>
+			<section className='intro'>
+				<div class='intro-container'>
+					<h1 class='brand-name'>MEHA BEAUTY</h1>
+					<p class='brand-description'>
+						MEHA Beauty là thương hiệu mỹ phẩm thiên nhiên, tiên phong phát
+						triển các sản phẩm chăm sóc da chiết xuất từ gạo sạch – an toàn,
+						lành tính và thân thiện với môi trường.
+						<br />
+						<br />
+						Chúng tôi tin rằng vẻ đẹp chân thật nhất đến từ thiên nhiên và sự
+						thuần khiết. Mỗi sản phẩm MEHA là kết tinh giữa tri thức bản địa và
+						công nghệ mỹ phẩm sạch, không hóa chất độc hại, minh bạch về thành
+						phần – chăm sóc làn da nhẹ dịu, hiệu quả và bền vững.
+						<br />
+						<br />
+						<strong>
+							MEHA – Khi vẻ đẹp bắt đầu từ hạt gạo, và lan tỏa thành lối sống
+							xanh.
+						</strong>
+					</p>
+				</div>
+			</section>
+		</div>
+	);
 }
 
 export default MainBanner;
+
+export const layout = {
+	areaId: 'content',
+	sortOrder: 10,
+};
