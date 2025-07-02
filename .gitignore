@@ -5,7 +5,6 @@ node_modules
 .vscode
 npm-debug.log
 /package-log.json
-/media
 /public
 .DS_Store
 .log
