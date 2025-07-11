@@ -19,10 +19,10 @@ export default function StripeLogo({ width = 80, height = 20 }) {
 
 StripeLogo.propTypes = {
   height: PropTypes.number,
-  width: PropTypes.number,
+  width: PropTypes.number
 };
 
 StripeLogo.defaultProps = {
   height: 10,
-  width: 20,
+  width: 20
 };

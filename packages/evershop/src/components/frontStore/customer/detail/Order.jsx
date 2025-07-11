@@ -64,23 +64,23 @@ export default function Order({ order }) {
 Order.propTypes = {
   order: PropTypes.shape({
     createdAt: PropTypes.shape({
-      text: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired
     }),
     grandTotal: PropTypes.shape({
-      text: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired
     }),
     items: PropTypes.arrayOf(
       PropTypes.shape({
         productPrice: PropTypes.shape({
-          text: PropTypes.string.isRequired,
+          text: PropTypes.string.isRequired
         }),
         productSku: PropTypes.string.isRequired,
         productName: PropTypes.string.isRequired,
         thumbnail: PropTypes.string,
-        qty: PropTypes.number.isRequired,
+        qty: PropTypes.number.isRequired
       })
     ),
     orderNumber: PropTypes.string.isRequired,
-    paymentStatus: PropTypes.string.isRequired,
-  }).isRequired,
+    paymentStatus: PropTypes.string.isRequired
+  }).isRequired
 };
