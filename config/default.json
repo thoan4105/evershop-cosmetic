@@ -24,6 +24,7 @@
     "showOutOfStockProduct": false
   },
   "system": {
+    "apiKey": "GoLVSFexUMFa78m0WPrbMt4v5WO95weR",
     "theme": "eve",
     "extensions": [
       {
@@ -41,9 +42,8 @@
     ],
     "qrPayment": {
       "enabled": 1,
-      "accountNumber": "1111686829",
-      "bankId": "techcombank",
-      "accountName": "Tran Cong Hoan"
+      "accountNumber": "0394195303",
+      "bankId": "mbbank"
     }
   }
 }
