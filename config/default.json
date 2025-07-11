@@ -28,8 +28,8 @@
     "theme": "eve",
     "extensions": [
       {
-        "name": "greeting_widget",
-        "resolve": "extensions/greeting_widget",
+        "name": "qr",
+        "resolve": "extensions/qr",
         "enabled": true,
         "priority": 20
       },

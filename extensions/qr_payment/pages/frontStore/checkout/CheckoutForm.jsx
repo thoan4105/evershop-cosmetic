@@ -115,7 +115,7 @@ export default function CheckoutForm({
   });
 
   const waitForPayment = async (orderId) => {
-    const maxTries = 20;
+    const maxTries = 5;
     let tries = 0;
 
     return new Promise((resolve, reject) => {
@@ -123,7 +123,7 @@ export default function CheckoutForm({
         tries++;
 
         const res = await fetch(
-          `${pollingPaymentStatusUrl}?order_id=${orderId}`
+          `${pollingPaymentStatusUrl}?order_id=${orderId}&payment_code=${paymentCode}`
         );
         const data = await res.json();
 
