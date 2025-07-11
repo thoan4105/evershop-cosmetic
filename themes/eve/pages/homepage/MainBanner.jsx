@@ -6,16 +6,16 @@ function MainBanner() {
 	useEffect(() => {
 		AOS.init({
 			duration: 1000,
-			once: true,
+			once: true
 		});
 	}, []);
 
 	return (
 		<div>
 			<section className='intro'>
-				<div class='intro-container'>
-					<h1 class='brand-name'>MEHA BEAUTY</h1>
-					<p class='brand-description'>
+				<div className='intro-container'>
+					<h1 className='brand-name'>MEHA BEAUTY</h1>
+					<p className='brand-description'>
 						MEHA Beauty là thương hiệu mỹ phẩm thiên nhiên, tiên phong phát
 						triển các sản phẩm chăm sóc da chiết xuất từ gạo sạch – an toàn,
 						lành tính và thân thiện với môi trường.
@@ -42,5 +42,5 @@ export default MainBanner;
 
 export const layout = {
 	areaId: 'content',
-	sortOrder: 10,
+	sortOrder: 10
 };

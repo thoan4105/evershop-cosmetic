@@ -22,10 +22,10 @@ export default function Layout() {
 								component: { default: Area },
 								props: {
 									id: 'icon-wrapper',
-									className: 'icon-wrapper flex justify-between space-x-1',
+									className: 'icon-wrapper flex justify-between space-x-1'
 								},
-								sortOrder: 20,
-							},
+								sortOrder: 20
+							}
 						]}
 					/>
 				</div>
@@ -130,5 +130,5 @@ export default function Layout() {
 
 export const layout = {
 	areaId: 'body',
-	sortOrder: 1,
+	sortOrder: 1
 };

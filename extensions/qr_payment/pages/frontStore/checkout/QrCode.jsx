@@ -21,7 +21,7 @@ function QrCodeApp({ total, returnUrl, pollingPaymentStatusUrl }) {
 export default function QRCodeMethod({
   cart: { grandTotal, currency },
   returnUrl,
-  pollingPaymentStatusUrl,
+  pollingPaymentStatusUrl
 }) {
   const checkout = useCheckout();
   const { paymentMethods, setPaymentMethods } = checkout;
@@ -46,12 +46,12 @@ export default function QRCodeMethod({
                   if (paymentMethod.code === "qrCode") {
                     return {
                       ...paymentMethod,
-                      selected: true,
+                      selected: true
                     };
                   } else {
                     return {
                       ...paymentMethod,
-                      selected: false,
+                      selected: false
                     };
                   }
                 })
@@ -114,7 +114,7 @@ export default function QRCodeMethod({
 
 export const layout = {
   areaId: "checkoutPaymentMethodqrCode",
-  sortOrder: 10,
+  sortOrder: 10
 };
 
 export const query = `

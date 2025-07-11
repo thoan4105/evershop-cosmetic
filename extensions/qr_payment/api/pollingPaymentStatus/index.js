@@ -1,16 +1,16 @@
 const { pool } = require("@evershop/evershop/src/lib/postgres/connection");
 const {
-  error,
+  error
 } = require("@evershop/evershop/src/lib/log/logger"); /* eslint-disable global-require */
 const {
   startTransaction,
   commit,
   rollback,
   select,
-  update,
+  update
 } = require("@evershop/postgres-query-builder");
 const {
-  getConnection,
+  getConnection
 } = require("@evershop/evershop/src/lib/postgres/connection");
 const { getConfig } = require("@evershop/evershop/src/lib/util/getConfig");
 const { debug } = require("@evershop/evershop/src/lib/log/logger");
@@ -68,7 +68,7 @@ module.exports = async (request, response, delegate, next) => {
       await update("order")
         .given({
           payment_status: "paid",
-          updated_at: new Date(),
+          updated_at: new Date()
         })
         .where("uuid", "=", order_id)
         .execute(connection);
@@ -77,7 +77,7 @@ module.exports = async (request, response, delegate, next) => {
 
       debug(`Payment valid for order ${order_id}, updating status to paid`);
       response.status(200).json({
-        status: "paid",
+        status: "paid"
       });
       return;
     }

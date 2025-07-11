@@ -4,14 +4,14 @@ const { pool } = require("@evershop/evershop/src/lib/postgres/connection");
 const { buildUrl } = require("@evershop/evershop/src/lib/router/buildUrl");
 const { getConfig } = require("@evershop/evershop/src/lib/util/getConfig");
 const {
-  getSetting,
+  getSetting
 } = require("@evershop/evershop/src/modules/setting/services/setting");
 const {
-  addNotification,
+  addNotification
 } = require("@evershop/evershop/src/modules/base/services/notifications");
 const { error } = require("@evershop/evershop/src/lib/log/logger");
 const {
-  updatePaymentStatus,
+  updatePaymentStatus
 } = require("@evershop/evershop/src/modules/oms/services/updatePaymentStatus");
 const { debug } = require("@evershop/evershop/src/lib/log/logger");
 

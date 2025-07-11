@@ -2,11 +2,11 @@
 process.env.ALLOW_CONFIG_MUTATIONS = 'true';
 const config = require('config');
 require('../basicSetup');
-const { Cart } = require('../../services/cart/Cart');
 const {
   hookAfter,
   hookBefore
 } = require('@evershop/evershop/src/lib/util/hookable');
+const { Cart } = require('../../services/cart/Cart');
 // Default tax configuration
 config.util.setModuleDefaults('pricing', {
   tax: {
@@ -33,7 +33,7 @@ describe('Test updateCartItemQty', () => {
   it('Auto add another item based on SKU', async () => {
     hookAfter(
       'updateCartItemQty',
-      async function addAnotherItem(updatedItem, cart, uuid, qty, action) {
+      async (updatedItem, cart, uuid, qty, action) => {
         if (action === 'increase' && updatedItem.getData('product_id') === 2) {
           await cart.addItem(4, 1, {});
         }
@@ -59,7 +59,7 @@ describe('Test updateCartItemQty', () => {
   it('Prevent update an item qty based on SKU', async () => {
     hookBefore(
       'updateCartItemQty',
-      async function preventUpdatingItemQty(cart, uuid) {
+      async (cart, uuid) => {
         const items = cart.getItems();
         const item = items.find((i) => i.getData('product_sku') === 'SKU2');
         if (item && item.getData('uuid') === uuid) {

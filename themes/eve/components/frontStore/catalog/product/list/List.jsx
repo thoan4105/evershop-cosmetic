@@ -6,10 +6,10 @@ import { Price } from "@components/frontStore/catalog/product/list/item/Price";
 import Area from "@components/common/Area";
 import { get } from "@evershop/evershop/src/lib/util/get";
 import { _ } from "@evershop/evershop/src/lib/locale/translate";
-import AddToCart from "../../../product/AddToCart";
 import { Form } from "@components/common/form/Form";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppState } from "@components/common/context/app";
+import AddToCart from "../../../product/AddToCart";
 
 export default function ProductList({ products = [], countPerRow = 3 }) {
   // const [loading, setLoading] = useState({});
@@ -100,23 +100,23 @@ export default function ProductList({ products = [], countPerRow = 3 }) {
               props: {
                 url: p.url,
                 imageUrl: get(p, "image.url"),
-                alt: p.name,
+                alt: p.name
               },
               sortOrder: 10,
-              id: "thumbnail",
+              id: "thumbnail"
             },
             {
               component: { default: Name },
               props: { name: p.name, url: p.url, id: p.productId },
               sortOrder: 20,
-              id: "name",
+              id: "name"
             },
             {
               component: { default: Price },
               props: { ...p.price },
               sortOrder: 30,
-              id: "price",
-            },
+              id: "price"
+            }
             // {
             //   component: { default: AddToCart },
             //   props: { loading: loading[p.productId] },
@@ -140,20 +140,20 @@ ProductList.propTypes = {
       price: PropTypes.shape({
         regular: PropTypes.shape({
           value: PropTypes.number,
-          text: PropTypes.string,
+          text: PropTypes.string
         }),
         special: PropTypes.shape({
           value: PropTypes.number,
-          text: PropTypes.string,
-        }),
+          text: PropTypes.string
+        })
       }),
       image: PropTypes.shape({
         alt: PropTypes.string,
-        listing: PropTypes.string,
-      }),
+        listing: PropTypes.string
+      })
     })
   ).isRequired,
-  countPerRow: PropTypes.number.isRequired,
+  countPerRow: PropTypes.number.isRequired
 };
 
 // export const query = `

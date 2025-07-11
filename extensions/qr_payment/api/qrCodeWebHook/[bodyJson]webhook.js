@@ -5,15 +5,15 @@ const {
   commit,
   rollback,
   select,
-  insertOnUpdate,
+  insertOnUpdate
 } = require("@evershop/postgres-query-builder");
 const {
-  getConnection,
+  getConnection
 } = require("@evershop/evershop/src/lib/postgres/connection");
 const { emit } = require("@evershop/evershop/src/lib/event/emitter");
 const { debug, error } = require("@evershop/evershop/src/lib/log/logger");
 const {
-  updatePaymentStatus,
+  updatePaymentStatus
 } = require("@evershop/evershop/src/modules/oms/services/updatePaymentStatus");
 const { display } = require("zero-decimal-currencies");
 const { getConfig } = require("@evershop/evershop/src/lib/util/getConfig");
@@ -40,7 +40,7 @@ module.exports = async (request, response, delegate, next) => {
   try {
     const event = JSON.parse(request.body);
 
-    const authHeader = request.headers["authorization"];
+    const authHeader = request.headers.authorization;
 
     if (!validApiKey(authHeader)) {
       await rollback(connection);
@@ -61,7 +61,7 @@ module.exports = async (request, response, delegate, next) => {
         content: event.content || null,
         transfer_amount: event.transferAmount || null,
         transfer_type: event.transferType || null,
-        transaction_date: new Date(event.transactionDate) || null,
+        transaction_date: new Date(event.transactionDate) || null
       })
       .execute(connection);
 

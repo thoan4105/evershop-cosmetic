@@ -74,15 +74,9 @@ describe('registry', () => {
   });
 
   it('It should execute the processor function in order', async () => {
-    const callback1 = jest.fn(async () => {
-      return 1;
-    });
-    const callback2 = jest.fn(async () => {
-      return 2;
-    });
-    const callback3 = jest.fn(async () => {
-      return 3;
-    });
+    const callback1 = jest.fn(async () => 1);
+    const callback2 = jest.fn(async () => 2);
+    const callback3 = jest.fn(async () => 3);
     addProcessor('test3', callback1, 10);
     addProcessor('test3', callback2, 5);
     addProcessor('test3', callback3, 20);
@@ -94,15 +88,9 @@ describe('registry', () => {
   });
 
   it('It should skip the processors if the init value and the context are identical', async () => {
-    const callback1 = jest.fn(async () => {
-      return 1;
-    });
-    const callback2 = jest.fn(async () => {
-      return 2;
-    });
-    const callback3 = jest.fn(async () => {
-      return 3;
-    });
+    const callback1 = jest.fn(async () => 1);
+    const callback2 = jest.fn(async () => 2);
+    const callback3 = jest.fn(async () => 3);
     addProcessor('test4', callback1, 10);
     addProcessor('test4', callback2, 5);
     addProcessor('test4', callback3, 20);
@@ -120,9 +108,7 @@ describe('registry', () => {
   });
 
   it('It should overwrite the init value and the context if the init value and the context are not identical', async () => {
-    const callback = jest.fn(async (value) => {
-      return ++value;
-    });
+    const callback = jest.fn(async (value) => ++value);
     addProcessor('test5', callback, 10);
     const value = await getValue('test5', 1, { a: 1 });
     expect(value).toEqual(2);
@@ -141,14 +127,10 @@ describe('registry', () => {
   });
 
   it('It should throw an error if the value does not pass the validator', async () => {
-    const callback = jest.fn(async (value) => {
-      return ++value;
-    });
+    const callback = jest.fn(async (value) => ++value);
     addProcessor('test6', callback, 10);
     expect(async () => {
-      await getValue('test6', 1, {}, (value) => {
-        return value > 3;
-      });
+      await getValue('test6', 1, {}, (value) => value > 3);
     }).rejects.toThrow(Error);
   });
 
@@ -161,15 +143,11 @@ describe('registry', () => {
   });
 
   it('It should throw an error if one of the processor throws an error', async () => {
-    const callback1 = jest.fn(async () => {
-      return 1;
-    });
+    const callback1 = jest.fn(async () => 1);
     const callback2 = jest.fn(async () => {
       throw new Error('error');
     });
-    const callback3 = jest.fn(async () => {
-      return 3;
-    });
+    const callback3 = jest.fn(async () => 3);
     addProcessor('test8', callback1, 2);
     addProcessor('test8', callback2, 5);
     addProcessor('test8', callback3, 20);
@@ -181,15 +159,11 @@ describe('registry', () => {
   });
 
   it('It should throw an error if one of the processor throws an error', () => {
-    const callback1 = jest.fn(() => {
-      return 1;
-    });
+    const callback1 = jest.fn(() => 1);
     const callback2 = jest.fn(() => {
       throw new Error('error');
     });
-    const callback3 = jest.fn(() => {
-      return 3;
-    });
+    const callback3 = jest.fn(() => 3);
     addProcessor('test9', callback1, 2);
     addProcessor('test9', callback2, 5);
     addProcessor('test9', callback3, 20);

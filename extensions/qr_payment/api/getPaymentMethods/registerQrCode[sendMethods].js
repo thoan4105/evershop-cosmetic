@@ -1,6 +1,6 @@
 const { getConfig } = require("@evershop/evershop/src/lib/util/getConfig");
 const {
-  getSetting,
+  getSetting
 } = require("@evershop/evershop/src/modules/setting/services/setting");
 
 // eslint-disable-next-line no-unused-vars
@@ -14,7 +14,7 @@ module.exports = async (request, response) => {
       methodName: await getSetting(
         "qrCodeDislayName",
         "Thanh toán chuyển khoản"
-      ),
+      )
     };
   } else {
     return null;

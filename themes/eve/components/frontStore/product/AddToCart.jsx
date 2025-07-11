@@ -2,7 +2,7 @@ import { _ } from "@evershop/evershop/src/lib/locale/translate";
 import React, { useEffect, useState } from "react";
 import "./AddToCart.scss";
 
-const AddToCart = ({ loading }) => {
+function AddToCart({ loading }) {
   const classButton = ["button-add-cart"];
 
   if (loading) {
@@ -18,7 +18,7 @@ const AddToCart = ({ loading }) => {
             style={{
               background: "rgb(255, 255, 255, 0)",
               display: "block",
-              shapeRendering: "auto",
+              shapeRendering: "auto"
             }}
             width="2rem"
             height="2rem"
@@ -48,11 +48,11 @@ const AddToCart = ({ loading }) => {
       </button>
     </div>
   );
-};
+}
 
 export default AddToCart;
 
 export const layout = {
   areaId: "productListingItem",
-  sortOrder: 1,
+  sortOrder: 1
 };

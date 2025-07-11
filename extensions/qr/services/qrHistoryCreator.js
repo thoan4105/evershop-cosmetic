@@ -3,7 +3,7 @@ const {
   getConnection,
   insert,
   rollback,
-  startTransaction,
+  startTransaction
 } = require("@evershop/postgres-query-builder");
 const { v4: uuidv4 } = require("uuid");
 const { pool } = require("@evershop/evershop/src/lib/postgres/connection");
@@ -17,7 +17,7 @@ async function saveQrHistory(req, connection) {
   const qrHistory = await insert("qr_history")
     .given({
       ...req.exportData(),
-      uuid: uuidv4().replace(/-/g, ""),
+      uuid: uuidv4().replace(/-/g, "")
     })
     .execute(connection);
   return order;
@@ -42,7 +42,7 @@ async function createQrHistory(req) {
 
 exports.createOrder = async (req) => {
   const qrHistory = await hookable(createQrHistory, {
-    req,
+    req
   })(req);
   return qrHistory;
 };

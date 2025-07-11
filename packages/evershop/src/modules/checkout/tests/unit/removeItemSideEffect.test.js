@@ -2,11 +2,11 @@
 process.env.ALLOW_CONFIG_MUTATIONS = 'true';
 const config = require('config');
 require('../basicSetup');
-const { Cart } = require('../../services/cart/Cart');
 const {
   hookAfter,
   hookBefore
 } = require('@evershop/evershop/src/lib/util/hookable');
+const { Cart } = require('../../services/cart/Cart');
 // Default tax configuration
 config.util.setModuleDefaults('pricing', {
   tax: {
@@ -32,7 +32,7 @@ describe('Test removeCartItem', () => {
   it('Auto remove another item based on SKU', async () => {
     hookAfter(
       'removeCartItem',
-      async function removeAnotherItem(removedItem, cart) {
+      async (removedItem, cart) => {
         const itemUUID = removedItem.getData('product_sku');
         if (itemUUID === 'SKU1') {
           await cart.removeItemBySku('SKU2');
@@ -57,7 +57,7 @@ describe('Test removeCartItem', () => {
   it('Prevent removing an item based on SKU', async () => {
     hookBefore(
       'removeCartItem',
-      async function preventRemovingItem(cart, uuid, context) {
+      async (cart, uuid, context) => {
         const items = cart.getItems();
         const item = items.find((i) => i.getData('sku') === 'SKU1');
         if (item && item.getData('uuid') === uuid) {

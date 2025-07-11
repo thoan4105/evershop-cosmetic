@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   useCheckout,
-  useCheckoutDispatch,
+  useCheckoutDispatch
 } from "@components/common/context/checkout";
 import { useQuery } from "urql";
 
@@ -69,16 +69,16 @@ export default function CheckoutForm({
   createPaymentSessionApi,
   returnUrl,
   total,
-  pollingPaymentStatusUrl,
+  pollingPaymentStatusUrl
 }) {
-  const [paymentCode, setPaymentCode] = useState("TH" + generateCode(6));
+  const [paymentCode, setPaymentCode] = useState(`TH${  generateCode(6)}`);
   const {
     steps,
     cartId,
     orderId,
     orderIntegerId,
     orderPlaced,
-    paymentMethods,
+    paymentMethods
   } = useCheckout();
   const { placeOrder, setError } = useCheckoutDispatch();
   const [expiresIn, setExpiresIn] = useState(300);
@@ -87,7 +87,7 @@ export default function CheckoutForm({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPaymentCode("TH" + generateCode(6));
+      setPaymentCode(`TH${  generateCode(6)}`);
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
@@ -109,9 +109,9 @@ export default function CheckoutForm({
   const [result] = useQuery({
     query: cartQuery,
     variables: {
-      cartId,
+      cartId
     },
-    pause: orderPlaced === true,
+    pause: orderPlaced === true
   });
 
   const waitForPayment = async (orderId) => {
@@ -146,13 +146,13 @@ export default function CheckoutForm({
           const res = await fetch(createPaymentSessionApi, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({
               cart_id: cartId,
               order_id: orderIntegerId.toString(),
-              transaction_code: paymentCode,
-            }),
+              transaction_code: paymentCode
+            })
           });
 
           const data = await res.json();
@@ -375,5 +375,5 @@ CheckoutForm.propTypes = {
   createPaymentSessionApi: PropTypes.string.isRequired,
   returnUrl: PropTypes.string.isRequired,
   total: PropTypes.number.isRequired,
-  pollingPaymentStatusUrl: PropTypes.string.isRequired,
+  pollingPaymentStatusUrl: PropTypes.string.isRequired
 };
