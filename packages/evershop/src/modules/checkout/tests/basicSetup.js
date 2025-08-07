@@ -69,17 +69,9 @@ addFinalProcessor('cartItemFields', (fields) => {
   }
 });
 
-addProcessor('cartItemProductLoaderFunction', () => {
-  return (id) => {
-    return products.find((product) => product.product_id === id);
-  };
-});
+addProcessor('cartItemProductLoaderFunction', () => (id) => products.find((product) => product.product_id === id));
 
-addProcessor('couponLoaderFunction', () => {
-  return (code) => {
-    return coupons.find((coupon) => coupon.coupon === code);
-  };
-});
+addProcessor('couponLoaderFunction', () => (code) => coupons.find((coupon) => coupon.coupon === code));
 
 addProcessor('couponValidatorFunctions', registerDefaultValidators);
 addProcessor('discountCalculatorFunctions', registerDefaultCalculators);

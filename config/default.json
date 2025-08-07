@@ -1,0 +1,49 @@
+{
+  "shop": {
+    "currency": "VND",
+    "language": "vi",
+    "weightUnit": "g"
+  },
+  "catalog": {
+    "product": {
+      "image": {
+        "thumbnail": {
+          "width": 200,
+          "height": 200
+        },
+        "listing": {
+          "width": 300,
+          "height": 300
+        },
+        "single": {
+          "width": 500,
+          "height": 500
+        }
+      }
+    },
+    "showOutOfStockProduct": false
+  },
+  "system": {
+    "apiKey": "GoLVSFexUMFa78m0WPrbMt4v5WO95weR",
+    "theme": "eve",
+    "extensions": [
+      {
+        "name": "qr",
+        "resolve": "extensions/qr",
+        "enabled": true,
+        "priority": 20
+      },
+      {
+        "name": "qr_payment",
+        "resolve": "extensions/qr_payment",
+        "enabled": true,
+        "priority": 10
+      }
+    ],
+    "qrPayment": {
+      "enabled": 1,
+      "accountNumber": "0394195303",
+      "bankId": "mbbank"
+    }
+  }
+}

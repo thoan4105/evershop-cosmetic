@@ -20,6 +20,8 @@
     "import"
   ],
   "rules": {
+    "func-names": "off",
+    "no-console": "warn",
     "comma-dangle": [
       "error",
       "never"
@@ -50,7 +52,6 @@
     "import/extensions": "off",
     "no-shadow": "off",
     "no-lonely-if": "warn",
-    "no-console": "error",
     "no-useless-return": "off"
   },
   "ignorePatterns": [

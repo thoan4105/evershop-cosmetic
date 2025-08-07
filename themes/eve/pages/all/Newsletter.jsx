@@ -31,5 +31,5 @@ export default Newsletter;
 
 export const layout = {
   areaId: "content",
-  sortOrder: 50,
+  sortOrder: 50
 };

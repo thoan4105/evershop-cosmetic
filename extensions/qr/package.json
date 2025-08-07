@@ -1,0 +1,13 @@
+{
+  "name": "qr",
+  "version": "1.0.0",
+  "description": "qr",
+  "keywords": [
+    "EverShop"
+  ],
+  "author": "hoantc",
+  "license": "GNU GENERAL PUBLIC LICENSE 3.0",
+  "engines": {
+    "node": ">= 14.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+.stripe-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.stripe-logo span {
+  font-size: 14px;
+  color: var(--text-color);
+  font-weight: 500;
+  transform: translateY(4px);
+}

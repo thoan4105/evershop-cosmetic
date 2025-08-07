@@ -1,0 +1,20 @@
+"""
+Represents a customer
+"""
+type QrHistory {
+  id: Int!
+  uuid: String!
+  gateway: String!
+  accountNumber: String!
+  transferAmount: Int!
+  code: String!
+  content: String!
+  transferType: String!
+  transactionDate: Date!
+  createdAt: Date
+  updatedAt: Date
+}
+
+extend type Query {
+  getPaymentByCode(code: String!): QrHistory
+}

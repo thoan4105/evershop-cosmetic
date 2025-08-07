@@ -39,7 +39,7 @@ export default function MobileMenu({ menu: { items } }) {
             </li>
           ))}
           <li className="nav-item">
-            <a className="nav-link hover:underline" href={"/page/contact"}>
+            <a className="nav-link hover:underline" href="/page/contact">
               Contact
             </a>
           </li>
@@ -54,15 +54,15 @@ MobileMenu.propTypes = {
     items: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,
-        url: PropTypes.string.isRequired,
+        url: PropTypes.string.isRequired
       })
-    ).isRequired,
-  }).isRequired,
+    ).isRequired
+  }).isRequired
 };
 
 export const layout = {
   areaId: "icon-wrapper",
-  sortOrder: 50,
+  sortOrder: 50
 };
 
 export const query = `

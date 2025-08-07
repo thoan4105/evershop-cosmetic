@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   useCheckout,
-  useCheckoutDispatch,
+  useCheckoutDispatch
 } from "@components/common/context/checkout";
 import { useQuery } from "urql";
 
@@ -69,16 +69,16 @@ export default function CheckoutForm({
   createPaymentSessionApi,
   returnUrl,
   total,
-  pollingPaymentStatusUrl,
+  pollingPaymentStatusUrl
 }) {
-  const [paymentCode, setPaymentCode] = useState("TH" + generateCode(6));
+  const [paymentCode, setPaymentCode] = useState(`TH${  generateCode(6)}`);
   const {
     steps,
     cartId,
     orderId,
     orderIntegerId,
     orderPlaced,
-    paymentMethods,
+    paymentMethods
   } = useCheckout();
   const { placeOrder, setError } = useCheckoutDispatch();
   const [expiresIn, setExpiresIn] = useState(300);
@@ -87,7 +87,7 @@ export default function CheckoutForm({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPaymentCode("TH" + generateCode(6));
+      setPaymentCode(`TH${  generateCode(6)}`);
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
@@ -109,13 +109,13 @@ export default function CheckoutForm({
   const [result] = useQuery({
     query: cartQuery,
     variables: {
-      cartId,
+      cartId
     },
-    pause: orderPlaced === true,
+    pause: orderPlaced === true
   });
 
   const waitForPayment = async (orderId) => {
-    const maxTries = 30;
+    const maxTries = 5;
     let tries = 0;
 
     return new Promise((resolve, reject) => {
@@ -123,7 +123,7 @@ export default function CheckoutForm({
         tries++;
 
         const res = await fetch(
-          `${pollingPaymentStatusUrl}?order_id=${orderId}`
+          `${pollingPaymentStatusUrl}?order_id=${orderId}&payment_code=${paymentCode}`
         );
         const data = await res.json();
 
@@ -132,6 +132,7 @@ export default function CheckoutForm({
           resolve("success");
         } else if (tries >= maxTries) {
           clearInterval(interval);
+          window.location.href = `${returnUrl}?order_id=${orderId}`;
           reject("failed or timeout");
         }
       }, 2000);
@@ -145,13 +146,13 @@ export default function CheckoutForm({
           const res = await fetch(createPaymentSessionApi, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({
               cart_id: cartId,
               order_id: orderIntegerId.toString(),
-              transaction_code: paymentCode,
-            }),
+              transaction_code: paymentCode
+            })
           });
 
           const data = await res.json();
@@ -190,10 +191,10 @@ export default function CheckoutForm({
     }
   }, [steps]);
 
-  const content = `${paymentCode} hoantc mai dinh`;
-  const bankId = "techcombank";
-  const accountNumber = "1111686829";
-  const accountName = "Tran Cong Hoan";
+  const content = `${paymentCode} mehabeauty`;
+  const bankId = "mbbank";
+  const accountNumber = "0394195303";
+  const accountName = "Dam Thi Mai";
   const urlQrCode = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.jpg?amount=${total}&addInfo=${content}&accountName=${accountName}`;
 
   const handleCopy = (text, field) => {
@@ -374,5 +375,5 @@ CheckoutForm.propTypes = {
   createPaymentSessionApi: PropTypes.string.isRequired,
   returnUrl: PropTypes.string.isRequired,
   total: PropTypes.number.isRequired,
-  pollingPaymentStatusUrl: PropTypes.string.isRequired,
+  pollingPaymentStatusUrl: PropTypes.string.isRequired
 };
